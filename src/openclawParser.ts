@@ -77,8 +77,8 @@ export function processOpenClawLine(
 
 	if (type !== 'message') return;
 
-	const role = (record as { role?: string }).role;
 	const message = record.message as Record<string, unknown> | undefined;
+	const role = message?.role as string | undefined;
 	const content = message?.content;
 
 	if (role === 'assistant') {
@@ -103,7 +103,7 @@ export function processOpenClawLine(
 			let hasNonExemptTool = false;
 			for (const tc of toolCalls) {
 				const toolName = (tc.name as string) || '';
-				const toolInput = (tc.input as Record<string, unknown>) || {};
+				const toolInput = (tc.arguments as Record<string, unknown>) || {};
 				const toolId = nextToolId(agentId);
 				const status = formatOpenClawToolStatus(toolName, toolInput);
 
