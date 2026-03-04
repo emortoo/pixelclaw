@@ -6,7 +6,7 @@ import { OpenClawController } from './openclawController.js';
 import { readLayoutFromFile, writeLayoutToFile } from './layoutPersistence.js';
 import { GLOBAL_KEY_SOUND_ENABLED } from './constants.js';
 
-export class PixelAgentsViewProvider implements vscode.WebviewViewProvider {
+export class PixelClawViewProvider implements vscode.WebviewViewProvider {
 	private controller: OpenClawController;
 	private webviewView: vscode.WebviewView | undefined;
 
@@ -68,16 +68,16 @@ export class PixelAgentsViewProvider implements vscode.WebviewViewProvider {
 			} else if (message.type === 'exportLayout') {
 				const layout = readLayoutFromFile();
 				if (!layout) {
-					vscode.window.showWarningMessage('Pixel Agents: No saved layout to export.');
+					vscode.window.showWarningMessage('PixelClaw: No saved layout to export.');
 					return;
 				}
 				const uri = await vscode.window.showSaveDialog({
 					filters: { 'JSON Files': ['json'] },
-					defaultUri: vscode.Uri.file(path.join(os.homedir(), 'pixel-agents-layout.json')),
+					defaultUri: vscode.Uri.file(path.join(os.homedir(), 'pixelclaw-layout.json')),
 				});
 				if (uri) {
 					fs.writeFileSync(uri.fsPath, JSON.stringify(layout, null, 2), 'utf-8');
-					vscode.window.showInformationMessage('Pixel Agents: Layout exported successfully.');
+					vscode.window.showInformationMessage('PixelClaw: Layout exported successfully.');
 				}
 			} else if (message.type === 'importLayout') {
 				const uris = await vscode.window.showOpenDialog({
@@ -89,14 +89,14 @@ export class PixelAgentsViewProvider implements vscode.WebviewViewProvider {
 					const raw = fs.readFileSync(uris[0].fsPath, 'utf-8');
 					const imported = JSON.parse(raw) as Record<string, unknown>;
 					if (imported.version !== 1 || !Array.isArray(imported.tiles)) {
-						vscode.window.showErrorMessage('Pixel Agents: Invalid layout file.');
+						vscode.window.showErrorMessage('PixelClaw: Invalid layout file.');
 						return;
 					}
 					this.controller.handleMessage({ type: 'saveLayout', layout: imported });
 					webviewView.webview.postMessage({ type: 'layoutLoaded', layout: imported });
-					vscode.window.showInformationMessage('Pixel Agents: Layout imported successfully.');
+					vscode.window.showInformationMessage('PixelClaw: Layout imported successfully.');
 				} catch {
-					vscode.window.showErrorMessage('Pixel Agents: Failed to read or parse layout file.');
+					vscode.window.showErrorMessage('PixelClaw: Failed to read or parse layout file.');
 				}
 			}
 		});
@@ -106,18 +106,18 @@ export class PixelAgentsViewProvider implements vscode.WebviewViewProvider {
 	exportDefaultLayout(): void {
 		const layout = readLayoutFromFile();
 		if (!layout) {
-			vscode.window.showWarningMessage('Pixel Agents: No saved layout found.');
+			vscode.window.showWarningMessage('PixelClaw: No saved layout found.');
 			return;
 		}
 		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
 		if (!workspaceRoot) {
-			vscode.window.showErrorMessage('Pixel Agents: No workspace folder found.');
+			vscode.window.showErrorMessage('PixelClaw: No workspace folder found.');
 			return;
 		}
 		const targetPath = path.join(workspaceRoot, 'webview-ui', 'public', 'assets', 'default-layout.json');
 		const json = JSON.stringify(layout, null, 2);
 		fs.writeFileSync(targetPath, json, 'utf-8');
-		vscode.window.showInformationMessage(`Pixel Agents: Default layout exported to ${targetPath}`);
+		vscode.window.showInformationMessage(`PixelClaw: Default layout exported to ${targetPath}`);
 	}
 
 	dispose() {

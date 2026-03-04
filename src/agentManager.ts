@@ -85,7 +85,7 @@ export function sendExistingAgents(
 			folderNames[id] = agent.folderName;
 		}
 	}
-	console.log(`[Pixel Agents] sendExistingAgents: agents=${JSON.stringify(agentIds)}, meta=${JSON.stringify(agentMeta)}`);
+	console.log(`[PixelClaw] sendExistingAgents: agents=${JSON.stringify(agentIds)}, meta=${JSON.stringify(agentMeta)}`);
 
 	postMessage({
 		type: 'existingAgents',

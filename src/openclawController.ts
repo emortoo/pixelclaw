@@ -23,8 +23,8 @@ import { readLayoutFromFile, writeLayoutToFile, watchLayoutFile } from './layout
 import type { LayoutWatcher } from './layoutPersistence.js';
 import { JSONL_POLL_INTERVAL_MS, AGENT_IDLE_TIMEOUT_MS } from './constants.js';
 
-const AGENTS_PERSIST_DIR = path.join(os.homedir(), '.pixel-agents');
-const AGENTS_PERSIST_FILE = path.join(AGENTS_PERSIST_DIR, 'agents.json');
+const PIXELCLAW_DIR = path.join(os.homedir(), '.pixelclaw');
+const AGENTS_PERSIST_FILE = path.join(PIXELCLAW_DIR, 'agents.json');
 
 export class OpenClawController {
 	agents = new Map<number, AgentState>();
@@ -289,8 +289,8 @@ export class OpenClawController {
 
 	private persistAgentMeta(): void {
 		try {
-			if (!fs.existsSync(AGENTS_PERSIST_DIR)) {
-				fs.mkdirSync(AGENTS_PERSIST_DIR, { recursive: true });
+			if (!fs.existsSync(PIXELCLAW_DIR)) {
+				fs.mkdirSync(PIXELCLAW_DIR, { recursive: true });
 			}
 			const data = {
 				agentMeta: this.agentMeta,

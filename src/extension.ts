@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { PixelAgentsViewProvider } from './PixelAgentsViewProvider.js';
+import { PixelClawViewProvider } from './PixelClawViewProvider.js';
 import { VIEW_ID, COMMAND_SHOW_PANEL, COMMAND_EXPORT_DEFAULT_LAYOUT } from './constants.js';
 
-let providerInstance: PixelAgentsViewProvider | undefined;
+let providerInstance: PixelClawViewProvider | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
-	const provider = new PixelAgentsViewProvider(context);
+	const provider = new PixelClawViewProvider(context);
 	providerInstance = provider;
 
 	context.subscriptions.push(

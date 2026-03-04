@@ -43,7 +43,7 @@ export function startFileWatching(
 		});
 		fileWatchers.set(agentId, watcher);
 	} catch (e) {
-		console.log(`[Pixel Agents] fs.watch failed for agent ${agentId}: ${e}`);
+		console.log(`[PixelClaw] fs.watch failed for agent ${agentId}: ${e}`);
 	}
 
 	// Secondary: fs.watchFile (stat-based polling, reliable on macOS)
@@ -52,7 +52,7 @@ export function startFileWatching(
 			readNewLines(agentId, agents, waitingTimers, permissionTimers, postMessage, lineProcessor);
 		});
 	} catch (e) {
-		console.log(`[Pixel Agents] fs.watchFile failed for agent ${agentId}: ${e}`);
+		console.log(`[PixelClaw] fs.watchFile failed for agent ${agentId}: ${e}`);
 	}
 
 	// Tertiary: manual poll as last resort
@@ -109,7 +109,7 @@ export function readNewLines(
 			lineProcessor(agentId, line, agents, waitingTimers, permissionTimers, postMessage);
 		}
 	} catch (e) {
-		console.log(`[Pixel Agents] Read error for agent ${agentId}: ${e}`);
+		console.log(`[PixelClaw] Read error for agent ${agentId}: ${e}`);
 	}
 }
 

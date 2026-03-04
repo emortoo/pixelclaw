@@ -102,7 +102,7 @@ export function startPermissionTimer(
 
 		if (hasNonExempt) {
 			agent.permissionSent = true;
-			console.log(`[Pixel Agents] Agent ${agentId}: possible permission wait detected`);
+			console.log(`[PixelClaw] Agent ${agentId}: possible permission wait detected`);
 			postMessage({
 				type: 'agentToolPermission',
 				id: agentId,
