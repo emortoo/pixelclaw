@@ -1,0 +1,16 @@
+[Unit]
+Description=PixelClaw Standalone Server
+After=network.target openclaw-gateway.service
+Wants=openclaw-gateway.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node %h/pixelclaw/dist/server.js
+Restart=always
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=%h
+WorkingDirectory=%h/pixelclaw
+
+[Install]
+WantedBy=default.target

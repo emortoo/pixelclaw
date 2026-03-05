@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenClaw Gateway
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=%h/.npm-global/bin/openclaw gateway run --bind loopback --port 18789
+Restart=always
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=%h
+WorkingDirectory=%h
+
+[Install]
+WantedBy=default.target

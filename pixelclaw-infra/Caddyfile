@@ -1,0 +1,33 @@
+{$DOMAIN:localhost} {
+    # Reverse proxy to PixelClaw
+    reverse_proxy pixelclaw:3847
+
+    # WebSocket support (PixelClaw uses WS for real-time updates)
+    @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websocket pixelclaw:3847
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+
+    # Compression
+    encode gzip zstd
+
+    # Cache static assets
+    @static {
+        path *.js *.css *.png *.jpg *.svg *.woff2 *.ico
+    }
+    header @static Cache-Control "public, max-age=86400"
+
+    log {
+        output stdout
+        format console
+    }
+}

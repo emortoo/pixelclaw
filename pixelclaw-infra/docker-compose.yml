@@ -1,0 +1,59 @@
+# PixelClaw Production Stack
+# Usage: docker compose up -d
+#
+# Before deploying:
+# 1. Set DOMAIN in .env (e.g., pixelclaw.yourdomain.com)
+# 2. Set MODEL_API_KEY in .env (for OpenClaw's LLM provider)
+# 3. Point DNS A record to your VPS IP
+
+services:
+  # ── Reverse Proxy (auto-SSL via Let's Encrypt) ────────
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"  # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+    depends_on:
+      - pixelclaw
+
+  # ── PixelClaw + OpenClaw ──────────────────────────────
+  pixelclaw:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - openclaw_data:/root/.openclaw
+      - pixelclaw_data:/app/data
+    environment:
+      - NODE_ENV=production
+      - OPENCLAW_MODEL=${OPENCLAW_MODEL:-moonshot/kimi-k2.5}
+      - OPENCLAW_API_KEY=${MODEL_API_KEY:-}
+    expose:
+      - "3847"
+
+  # ── Auto-deploy on image push ─────────────────────────
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300  # Check every 5 min
+      - WATCHTOWER_LABEL_ENABLE=false
+    command: --interval 300
+
+volumes:
+  caddy_data:
+  caddy_config:
+  openclaw_data:
+  pixelclaw_data:
