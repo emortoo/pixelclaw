@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelClaw Web4 - Control Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .sidebar {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .sidebar h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+        
+        .floor-list {
+            list-style: none;
+        }
+        
+        .floor-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .floor-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(0,212,255,0.3);
+        }
+        
+        .floor-item.active {
+            background: rgba(0,212,255,0.2);
+            border-color: #00d4ff;
+        }
+        
+        .floor-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .floor-meta {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+        
+        .agents-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .agents-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00d4ff;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .agent-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .agent-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .agent-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .agent-role {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 8px;
+        }
+        
+        .agent-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-working {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+        
+        .status-idle {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .status-meeting {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+        }
+        
+        .status-away {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .view-office-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .view-office-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,212,255,0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏢 PixelClaw Web4 Control Center</h1>
+    </div>
+    
+    <div class="container">
+        <aside class="sidebar">
+            <h2>📍 Floors</h2>
+            <ul class="floor-list" id="floorList">
+                <li class="loading">Loading floors...</li>
+            </ul>
+        </aside>
+        
+        <main class="main-content">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAgents">-</div>
+                    <div class="stat-label">Total Agents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activeAgents">-</div>
+                    <div class="stat-label">Working Now</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalFloors">-</div>
+                    <div class="stat-label">Floors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="meetings">-</div>
+                    <div class="stat-label">In Meetings</div>
+                </div>
+            </div>
+            
+            <div class="agents-section">
+                <h2><span class="status-dot"></span> Active Agents</h2>
+                <div class="agent-grid" id="agentGrid">
+                    <div class="loading">Loading agents...</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="/" class="view-office-btn">🎮 View 3D Office</a>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        let currentFloor = 'ceo';
+        
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`);
+                return await response.json();
+            } catch (err) {
+                console.error('API Error:', err);
+                return null;
+            }
+        }
+        
+        async function loadFloors() {
+            const data = await fetchData('/floors');
+            if (!data) return;
+            
+            const floorList = document.getElementById('floorList');
+            floorList.innerHTML = data.floors.map(floor => `
+                <li class="floor-item ${floor.id === data.activeFloorId ? 'active' : ''}" 
+                    onclick="switchFloor('${floor.id}')">
+                    <div class="floor-name">${floor.name}</div>
+                    <div class="floor-meta">
+                        ${floor.type} • ${floor.size.cols}×${floor.size.rows} • Capacity: ${floor.capacity}
+                    </div>
+                </li>
+            `).join('');
+            
+            currentFloor = data.activeFloorId;
+        }
+        
+        async function loadStats() {
+            const [status, activity] = await Promise.all([
+                fetchData('/status'),
+                fetchData('/activity')
+            ]);
+            
+            if (status) {
+                document.getElementById('totalAgents').textContent = status.totalAgents;
+                document.getElementById('activeAgents').textContent = status.activeAgents;
+                document.getElementById('totalFloors').textContent = status.floors;
+            }
+            
+            if (activity) {
+                document.getElementById('meetings').textContent = activity.stats.inMeetings;
+            }
+        }
+        
+        async function loadAgents() {
+            const data = await fetchData('/agents');
+            if (!data || !data.agents) return;
+            
+            const agentGrid = document.getElementById('agentGrid');
+            if (data.agents.length === 0) {
+                agentGrid.innerHTML = '<div class="loading">No agents on this floor</div>';
+                return;
+            }
+            
+            agentGrid.innerHTML = data.agents.map(agent => `
+                <div class="agent-card">
+                    <div class="agent-avatar">${agent.name.charAt(0)}</div>
+                    <div class="agent-name">${agent.name}</div>
+                    <div class="agent-role">${agent.role} • ${agent.department || 'N/A'}</div>
+                    <span class="agent-status status-${agent.status}">${agent.status}</span>
+                </div>
+            `).join('');
+        }
+        
+        async function switchFloor(floorId) {
+            try {
+                const response = await fetch(`${API_BASE}/floors/${floorId}/activate`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentFloor = floorId;
+                    await loadFloors();
+                    await loadAgents();
+                }
+            } catch (err) {
+                console.error('Failed to switch floor:', err);
+            }
+        }
+        
+        // Initial load
+        loadFloors();
+        loadStats();
+        loadAgents();
+        
+        // Refresh every 5 seconds
+        setInterval(() => {
+            loadStats();
+            loadAgents();
+        }, 5000);
+    </script>
+</body>
+</html>
